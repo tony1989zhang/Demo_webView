@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+
+    <color name="black_overlay">#66000000</color>
+
+    <color name="white">#FFF</color>
+    <color name="main_color">#f0f0f0</color>
+    <color name="text_default_color">#4b4b4b</color>
+    <color name="text_hint_color">#969696</color>
+    <color name="text_default_yellow">#f0c21f</color>
+
+    <color name="line_hint_color">#cbcbcb</color>
+    <color name="title_bg_color">#00aaf2</color>
+    <!--fff6f6f6-->
+    <color name="item_list_press">#fff6f6f6</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="swipe_refrsh_color1">#6a6aff</color>
+    <color name="swipe_refrsh_color2">#FF4081</color>
+    <color name="swipe_refrsh_color3">#f0c21f</color>
+    <color name="swipe_refrsh_color4">#969696</color>
+
+
+    <color name="spinner_color">#002e3c</color>
+    <color name="spinner_color_press">#004361</color>
+    <color name="title_column_color">#f8f8f8</color>
+    <color name="title_red">#e83536</color>
+    <color name="title_red_press">#33000000</color>
+
+    <color name="backgroundColor">#50555555</color>
+    <color name="roundColor">#50555555</color>
+    <color name="roundProgressColor">#FF6ADBFE</color>
+    <color name="textColor">#FFFFFF</color>
+
+
+</resources>

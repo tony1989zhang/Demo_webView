@@ -1,0 +1,74 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1.0" />
+
+
+    <LinearLayout
+        android:id="@+id/iv_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:orientation="horizontal"
+        android:padding="30dp"/>
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/layout_btn"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:paddingRight="11sp"-->
+        <!--android:gravity="center|right"-->
+        <!--android:visibility="gone"-->
+        <!--android:layout_marginBottom="50dp"-->
+      <!--&gt;-->
+
+
+    <!--</LinearLayout>-->
+
+    <com.lottotrend.demo_webview.CountDownView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/countDownView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="13dp"
+        android:padding="10dp"
+        android:layout_marginTop="150dp"
+        app:textColor="@color/white"
+        android:layout_below="@+id/iv_image"
+        app:roundColor="@color/roundColor"
+        app:backgroundColor="@color/backgroundColor"
+        app:roundProgressColor="@color/roundProgressColor"
+        app:countdownTime="10000"
+        app:roundWidth="3dp"
+        app:textSize="15sp"
+        app:text="点击跳过"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/btn_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="welOnClick"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/selector_btn_submit"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:textSize="30sp"
+        android:text="立即体验"
+        android:textColor="@color/white" />
+
+</RelativeLayout>
