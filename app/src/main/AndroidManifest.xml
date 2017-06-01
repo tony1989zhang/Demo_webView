@@ -58,8 +58,14 @@
             </activity>
         <activity android:name="com.shishizhong.pbx.WelAct"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <data android:scheme="myapp"/>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+            </intent-filter>
+        </activity>
 
         <!-- Rich push 核心功能 since 2.0.6-->
         <activity

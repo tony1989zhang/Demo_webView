@@ -13,6 +13,7 @@
     </style>
     <style name="splash_style2" parent="@android:style/Theme.NoTitleBar">
         <item name="android:windowNoTitle">true</item>
+        <item name="android:background">#FAA0A0</item>
     </style>
 
     <style name="hometab_style">

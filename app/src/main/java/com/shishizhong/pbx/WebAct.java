@@ -1,18 +1,6 @@
 package com.shishizhong.pbx;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import com.google.zxing.Result;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -26,8 +14,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -48,15 +34,21 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static android.content.ContentValues.TAG;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 public class WebAct extends BaseActivity implements OnLongClickListener,OnClickListener{
-    // Content View Elements
 
     private WebView mWebView;
     private RelativeLayout mLoading;
@@ -70,18 +62,12 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
     public static final String WEB_EXT_TITLE = "ext_title";
     private String mUrl = "";
     private boolean isHome;
-    private boolean isHide;
     private File file;
-    private boolean isQR;//判断是否为二维码
     private ArrayAdapter<String> adapter;
 
-    private Result result;//二维码解析结果
     private CustomDialog mCustomDialog;
-    private long firstBack;
     boolean isBase64 = false;
 	boolean isFist = false;
-
-    // End Of Content View Elements
 
     private void bindViews() {
 
@@ -105,10 +91,9 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//		mTitleView = null;
-//		mWebView = null;
-//		mLoadFailed = null;
-//		mLoading = null;
+		mWebView = null;
+		mLoadFailed = null;
+		mLoading = null;
         setContentView(R.layout.view_null);
     }
     
@@ -122,10 +107,7 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 
 	private void initWebView() {
 		    mUrl = this.getIntent().getStringExtra(WEB_EXT_URL);
-	        String title = this.getIntent().getStringExtra(WEB_EXT_TITLE);
 		    mUrl = "http://www.shishizhongaztz.com/";
-		//    mUrl = "http://www.shishizhong888.com/";
-//		    mUrl = "http://u10010.dded76.shishizhong888.com/";
 	        mWebView.setInitialScale(50);
 	        mWebView.setWebViewClient(new LCHWebViewClient());
 	        mWebView.setWebChromeClient(new CusWebChromeClient());
@@ -165,7 +147,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 	            else
 				{   isHome = false;}
 
-	           // view.loadUrl(url);
 				if (parseScheme(url)) {
 					try {
 						Uri uri = Uri.parse(url);
@@ -174,7 +155,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 								Intent.URI_INTENT_SCHEME);
 						intent.addCategory("android.intent.category.BROWSABLE");
 						intent.setComponent(null);
-						// intent.setSelector(null);
 						startActivity(intent);
 
 					} catch (Exception e) {
@@ -228,7 +208,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 
 	        @Override
 	        public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
-//	            setDlg(message,result);
 	            return super.onJsConfirm(view, url, message, result);
 	        }
 
@@ -240,26 +219,22 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 	            cusDlg2.setOperationListener(new OnOperationListener() {
 	                @Override
 	                public void onLeftClick() {
-//	                    result.cancel();
 	                    cusDlg2.cancel();
 	                }
 
 	                @Override
 	                public void onRightClick() {
-//	                    result.cancel();
 	                    cusDlg2.cancel();
 	                }
 	            });
 	            cusDlg2.show();
 	        }
 
-
 			//扩展浏览器上传文件
 			//3.0++版本
 			public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
 				openFileChooserImpl(uploadMsg);
 			}
-
 			//3.0--版本
 			public void openFileChooser(ValueCallback<Uri> uploadMsg) {
 				openFileChooserImpl(uploadMsg);
@@ -268,7 +243,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 			public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
 				openFileChooserImpl(uploadMsg);
 			}
-
 			@Override
 			public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
 				onenFileChooseImpleForAndroid(filePathCallback);
@@ -291,11 +265,9 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 		Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
 		contentSelectionIntent.setType("image/*");
-
 		Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
 		chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
 		chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-
 		startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE_FOR_ANDROID_5);
 	}
 
@@ -306,106 +278,50 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 			 final WebView.HitTestResult htr = mWebView.getHitTestResult();
 		        if (htr.getType() == WebView.HitTestResult.IMAGE_TYPE) {
 		            String extra = htr.getExtra();
+
 		            if (extra.startsWith("data:image/png;base64,")) {
 		                isBase64 = true;
 		                String[] split = extra.split(",");
 		                // 获取到图片地址后做相应的处理
-		                MyAsyncTask mTask = new MyAsyncTask();
+						MyAsyncTask mTask = new MyAsyncTask();
 		                mTask.execute(split[1]);
-		                showDialog();
+						showDialog();
 		            } else {
 		                isBase64 = false;
 		                // 获取到图片地址后做相应的处理
-		                MyAsyncTask mTask = new MyAsyncTask();
+						MyAsyncTask mTask = new MyAsyncTask();
 		                mTask.execute(htr.getExtra());
-		                showDialog();
+						showDialog();
 		            }
 		        }
 		        return false;
 		}
 		   public class MyAsyncTask extends AsyncTask<String, Void, String> {
-
-
 		        @Override
 		        protected void onPostExecute(String s) {
 		            super.onPostExecute(s);
-
-		            if (isQR) {
-		                handler.sendEmptyMessage(0);
-		            }
-
-
 		        }
 
 		        @Override
 		        protected String doInBackground(String... params) {
-		          /*  XgoLog.e("params:" + params[0]);
-		           decodeImage(params[0]);
-		            getBitmap(params[0]);*/
 		            decodeImage(params[0]);
 		            return null;
 		        }
 		    }
-	private static final int WRITE_EXTERNAL_STORAGE_TASK_CODE = 1;
-		   /**
-		     * 判断是否为二维码
-		     * param url 图片地址
-		     * return
-		     */
-		    private boolean decodeImage(String sUrl) {
+
+		    private void decodeImage(String sUrl) {
 		        if (isBase64) {
 		            Bitmap bitmap = PictureUtil.base64ToBitmap(sUrl);
-		            result = DecodeImage.handleQRCodeFormBitmap(bitmap);
-//					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-//						//如果6.0以上版本
-//					}else {
-						saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
-//					}
-
+					saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
 		        } else {
-					Log.e("getBitMap","getBitmap:" + getBitmap(sUrl));
-					result = DecodeImage.handleQRCodeFormBitmap(getBitmap(sUrl));
+					getBitmap(sUrl);
 		        }
-		        if (result == null) {
-		            isQR = false;
-		        } else {
-		            isQR = true;
-		        }
-		        return isQR;
 		    }
-
-		    /**
-		     * 是二维码时，才添加为识别二维码
-		     */
-		    @SuppressLint("HandlerLeak")
-		    private Handler handler = new Handler() {
-		        public void handleMessage(Message msg) {
-		            isQR  = false;//暂放
-		            if (msg.what == 0) {
-		                if (isQR) {
-		                    adapter.add("识别图中二维码");
-		                }
-		                adapter.notifyDataSetChanged();
-		            }
-		        }
-
-		        ;
-		    };
-
-		    /**
-		     * 初始化数据
-		     */
 		    private void initAdapter() {
 		        adapter = new ArrayAdapter<String>(this, R.layout.item_dialog);
-		      //  adapter.add("发送给朋友");
 		        adapter.add("保存到手机");
-		      //  adapter.add("收藏");
 		    }
 
-		    /**
-		     * 显示Dialog
-		     * param v
-		     */
 		    private void showDialog() {
 		        initAdapter();
 		        mCustomDialog = new CustomDialog(this) {
@@ -424,10 +340,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 		                                saveImageToGallery(WebAct.this);
 		                                closeDialog();
 		                                break;
-		                            case 1:
-		                                goIntent();
-		                                closeDialog();
-		                                break;
 		                        }
 
 		                    }
@@ -437,17 +349,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 		        mCustomDialog.show();
 		    }
 		 
-		    /**
-		     * 发送给好友
-		     */
-		    private void sendToFriends() {
-		        Intent intent = new Intent(Intent.ACTION_SEND);
-		        Uri imageUri = Uri.parse(file.getAbsolutePath());
-		        intent.setType("image/*");
-		        intent.putExtra(Intent.EXTRA_STREAM, imageUri);
-		        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		        startActivity(Intent.createChooser(intent, getTitle()));
-		    }
 
 		    /**
 		     * 先保存到本地再广播到图库
@@ -465,43 +366,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 		        }
 		    }
 
-		    public void goIntent() {
-		      /*  try {
-		            Uri uri = Uri.parse(result.toString());
-		            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-		            startActivity(intent);
-		        }
-		        catch ()*/
-		        try {
-		            goToWx(result.toString());
-		        } catch (Exception e) {
-		            Toast.makeText(this, "添加", Toast.LENGTH_SHORT).show();
-		        }
-		    }
-
-		    public void goToWx(String url) {
-		        // 如下方案可在非微信内部WebView的H5页面中调出微信支付
-		        if (url.startsWith("weixin://wxpay/")) {
-		            Intent intent = new Intent();
-		            intent.setAction(Intent.ACTION_VIEW);
-		            intent.setData(Uri.parse(url));
-		            startActivity(intent);
-		        } else if (parseScheme(url)) {
-		            try {
-		                Intent intent;
-		                intent = Intent.parseUri(url,
-		                        Intent.URI_INTENT_SCHEME);
-		                intent.addCategory("android.intent.category.BROWSABLE");
-		                intent.setComponent(null);
-		                // intent.setSelector(null);
-		                startActivity(intent);
-		            } catch (Exception e) {
-		                e.printStackTrace();
-		            }
-		        } else {
-		        }
-		    }
-
 		    public boolean parseScheme(String url) {
 		        if (url.contains("platformapi/startapp")) {
 		            return true;
@@ -516,7 +380,6 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 		    public void showDLg() {
 
 		        final CusDlg cusDlg = new CusDlg(this);
-
 		        cusDlg.setButtonsText("复制", "取消");
 		        cusDlg.setTitle("" + SPUtil.getInstant(this).get("cn.jpush.android.NOTIFICATION_CONTENT_TITLE", "提示"));
 		        cusDlg.setMessage("" + SPUtil.getInstant(this).get("cn.jpush.android.ALERT", "有新消息"));
@@ -549,7 +412,7 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 		                InputStream inputStream = conn.getInputStream();
 		                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
 						Log.e("bitmap","" + bitmap);
-							saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
+						saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
 		                return bitmap;
 		            }
 		        } catch (Exception e) {
@@ -571,12 +434,22 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 			//如果App的权限申请曾经被用户拒绝过，就需要在这里跟用户做出解释
 			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
 					android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				Toast.makeText(this,"please give me the permission",Toast.LENGTH_SHORT).show();
+				Toast.makeText(this,"请在设置内允许本应用保存照片",Toast.LENGTH_SHORT).show();
 			} else {
 				//进行权限请求
 				ActivityCompat.requestPermissions(this,
 						new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
 						EXTERNAL_STORAGE_REQ_CODE);
+			}
+		}else{
+			//进行权限请求
+			try {
+				if (!file.exists()) {
+					file.createNewFile();
+				}
+				setFileOp();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -591,14 +464,15 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 				if (grantResults.length > 0
 						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					//申请成功，进行相应操作
-					if (!file.exists()) {
 						try {
+							if (!file.exists()) {
 							file.createNewFile();
+							}
 							setFileOp();
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}
+
 				} else {
 					//申请失败，可以继续向用户解释。
 					Toast.makeText(WebAct.this, "手机不让申请", Toast.LENGTH_SHORT).show();
@@ -616,12 +490,10 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 	         Bitmap mBitmap = null;
 		    public void saveMyBitmap(Bitmap mBitmap, String bitName) {
 
-
 				this.mBitmap = mBitmap;
-					file = new File(Environment.getExternalStorageDirectory() + "/" + bitName + ".jpg");
-				if ( Build.VERSION.SDK_INT >= 21 ) {
+				file = new File(Environment.getExternalStorageDirectory() + "/" + bitName + ".jpg");
+				if ( Build.VERSION.SDK_INT >=  Build.VERSION_CODES.M) {
 					requestPermission();
-
 				}else {
 					setFileOp();
 				}
@@ -631,20 +503,15 @@ public class WebAct extends BaseActivity implements OnLongClickListener,OnClickL
 		FileOutputStream fOut = null;
 		try {
             fOut = new FileOutputStream(file);
+			mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+			fOut.flush();
+			fOut.close();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-		mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-		try {
-            fOut.flush();
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-		try {
-            fOut.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+			e.printStackTrace();
+		}
 	}
 
 
