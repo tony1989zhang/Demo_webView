@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lottotrend.demo_webview">
+    package="com.shishizhong.pbx">
     <!-- Required -->
     <permission
-        android:name="com.lottotrend.demo_webview.permission.JPUSH_MESSAGE"
+        android:name="com.shishizhong.pbx.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
 
     <!-- Required  一些系统要求的权限，如访问网络等-->
-    <uses-permission android:name="com.lottotrend.demo_webview.permission.JPUSH_MESSAGE" />
+    <uses-permission android:name="com.shishizhong.pbx.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -37,18 +37,29 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:name=".App"
+        android:name="com.shishizhong.pbx.App"
+        android:theme="@style/splash_style"
         android:supportsRtl="true"
-        android:theme="@style/splash_style">
-        <activity android:name=".SplanshAct">
+      >
+        <!--android:theme="@style/splash_style"-->
+        <activity android:name="com.shishizhong.pbx.SplanshAct"
+            android:theme="@style/splash_style2"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WebAct"/>
-        <activity android:name=".WelAct"/>
+        <activity android:name="com.shishizhong.pbx.WebAct"
+            android:screenOrientation="portrait"
+            >
+
+            </activity>
+        <activity android:name="com.shishizhong.pbx.WelAct"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            />
 
         <!-- Rich push 核心功能 since 2.0.6-->
         <activity
@@ -66,7 +77,7 @@
             <intent-filter>
                 <action android:name="cn.jpush.android.ui.PushActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="com.lottotrend.demo_webview" />
+                <category android:name="com.shishizhong.pbx" />
             </intent-filter>
         </activity>
 
@@ -92,7 +103,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.DaemonService" />
-                <category android:name="com.lottotrend.demo_webview" />
+                <category android:name="com.shishizhong.pbx" />
             </intent-filter>
 
         </service>
@@ -104,7 +115,7 @@
             android:exported="false">
             <intent-filter android:priority="1000">
                 <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED_PROXY" />   <!--Required  显示通知栏 -->
-                <category android:name="com.lottotrend.demo_webview" />
+                <category android:name="com.shishizhong.pbx" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
@@ -122,7 +133,7 @@
         <!-- Required SDK核心功能-->
         <receiver android:name="cn.jpush.android.service.AlarmReceiver" android:exported="false"/>
         <receiver
-            android:name=".MyReceiver"
+            android:name="com.shishizhong.pbx.MyReceiver"
             android:exported="false"
             android:enabled="true">
             <intent-filter>
@@ -131,13 +142,13 @@
                 <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" /> <!--Required  用户接收SDK通知栏信息的intent-->
                 <action android:name="cn.jpush.android.intent.NOTIFICATION_OPENED" /> <!--Required  用户打开自定义通知栏的intent-->
                 <action android:name="cn.jpush.android.intent.CONNECTION" /><!-- 接收网络变化 连接/断开 since 1.6.3 -->
-                <category android:name="com.lottotrend.demo_webview" />
+                <category android:name="com.shishizhong.pbx" />
             </intent-filter>
         </receiver>
 
         <!-- Required  . Enable it you can get statistics data with channel -->
         <meta-data android:name="JPUSH_CHANNEL" android:value="developer-default"/>
-        <meta-data android:name="JPUSH_APPKEY" android:value="2117cf70cb396abb4d6a53f6" /> <!--  </>值来自开发者平台取得的AppKey-->
+        <meta-data android:name="JPUSH_APPKEY" android:value="b538e9de6202fd49e6d576ab" /> <!--  </>值来自开发者平台取得的AppKey-->
     </application>
 
 </manifest>

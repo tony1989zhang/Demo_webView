@@ -1,22 +1,17 @@
-package com.lottotrend.demo_webview;
+package com.shishizhong.pbx;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import static android.R.attr.x;
+
 /**
  * Created by Administrator on 2017/5/16 0016.
  */
-public class SplanshAct extends Activity{
+public class SplanshAct extends BaseActivity{
 
-    private long splanshTime = 1000;
+    private long splanshTime = 2000;
     private ImageView mIv;
 
     @Override
@@ -29,7 +24,12 @@ public class SplanshAct extends Activity{
     }
 
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mIv = null;
+        setContentView(R.layout.view_null);
+    }
 
     private void doJump() {
         final boolean isFristStart = (boolean) SPUtil.getInstant(this).get(Constants.IS_FRIST_START_APP, false);

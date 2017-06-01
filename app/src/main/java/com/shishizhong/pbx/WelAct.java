@@ -1,4 +1,4 @@
-package com.lottotrend.demo_webview;
+package com.shishizhong.pbx;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import java.util.List;
 /**
  * 作用：欢迎页面
  */
-public class WelAct extends Activity{
+public class WelAct extends BaseActivity{
     private ViewPager m_viewpager;
     private LinearLayout m_iv_image;
     private VpAdapter adapter;
@@ -51,6 +50,12 @@ public class WelAct extends Activity{
                 goToWebAct();
             }
         });
+//        countDownView.startCountdown();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         countDownView.startCountdown();
     }
 
@@ -58,17 +63,19 @@ public class WelAct extends Activity{
      * 开始
      * @param view
      */
-    public void onStart(View view) {
-        countDownView.startCountdown();
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        countDownView.stopCountdown();
     }
 
     /**
      * 停止
      * @param view
      */
-    public void onStop(View view) {
-        countDownView.stopCountdown();
-    }
+
 
 
     private void initView() {
@@ -187,4 +194,5 @@ public class WelAct extends Activity{
         finish();
         overridePendingTransition(R.anim.zoomin,R.anim.zoomout);
     }
+
 }

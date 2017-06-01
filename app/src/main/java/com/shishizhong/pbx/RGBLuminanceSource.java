@@ -16,7 +16,7 @@
  * limitations under the License.
  */
  
-package com.lottotrend.demo_webview;
+package com.shishizhong.pbx;
  
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

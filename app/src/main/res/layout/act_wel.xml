@@ -36,7 +36,7 @@
 
     <!--</LinearLayout>-->
 
-    <com.lottotrend.demo_webview.CountDownView
+    <com.shishizhong.pbx.CountDownView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/countDownView"
         android:layout_width="wrap_content"
@@ -49,7 +49,7 @@
         app:roundColor="@color/roundColor"
         app:backgroundColor="@color/backgroundColor"
         app:roundProgressColor="@color/roundProgressColor"
-        app:countdownTime="10000"
+        app:countdownTime="4000"
         app:roundWidth="3dp"
         app:textSize="15sp"
         app:text="点击跳过"

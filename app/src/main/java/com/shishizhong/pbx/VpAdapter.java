@@ -1,4 +1,4 @@
-package com.lottotrend.demo_webview;
+package com.shishizhong.pbx;
 
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;

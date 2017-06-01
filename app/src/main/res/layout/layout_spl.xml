@@ -15,6 +15,7 @@
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"
         android:layout_gravity="center"
+        android:src="@drawable/launch"
         />
     <!--android:src="@mipmap/pk10_sp"-->
 </LinearLayout>

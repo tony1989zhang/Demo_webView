@@ -1,8 +1,9 @@
-package com.lottotrend.demo_webview;
+package com.shishizhong.pbx;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -16,6 +17,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -27,22 +29,23 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings.RenderPriority;
 import android.webkit.WebSettings.ZoomDensity;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -50,12 +53,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class WebAct extends Activity implements OnLongClickListener,OnClickListener{
+import static android.content.ContentValues.TAG;
+
+public class WebAct extends BaseActivity implements OnLongClickListener,OnClickListener{
     // Content View Elements
 
     private WebView mWebView;
     private RelativeLayout mLoading;
-    private ProgressBar mLoading_progress;
     private TextView mLoadFailed;
     private TextView mTv1;
     private TextView mTv2;
@@ -83,7 +87,6 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 
         mWebView = (WebView) findViewById(R.id.activty_wb_content);
         mLoading = (RelativeLayout) findViewById(R.id.loading);
-        mLoading_progress = (ProgressBar) findViewById(R.id.loading_progress);
         mLoadFailed = (TextView) findViewById(R.id.load_faild);
         mTv1 = (TextView) findViewById(R.id.tv1);
         mTv2 = (TextView) findViewById(R.id.tv2);
@@ -162,8 +165,28 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 	            else
 				{   isHome = false;}
 
-	            view.loadUrl(url);
-	            return true;
+	           // view.loadUrl(url);
+				if (parseScheme(url)) {
+					try {
+						Uri uri = Uri.parse(url);
+						Intent intent;
+						intent = Intent.parseUri(url,
+								Intent.URI_INTENT_SCHEME);
+						intent.addCategory("android.intent.category.BROWSABLE");
+						intent.setComponent(null);
+						// intent.setSelector(null);
+						startActivity(intent);
+
+					} catch (Exception e) {
+
+					}
+				} else {
+					view.loadUrl(url);
+				}
+
+
+
+				return true;
 	        }
 
 	        @Override
@@ -191,6 +214,7 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 	            mWebView.requestFocus();
 	            mWebView.requestFocusFromTouch();
 	        }
+
 	    }
 
 	    class CusWebChromeClient extends WebChromeClient {
@@ -228,7 +252,53 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 	            });
 	            cusDlg2.show();
 	        }
+
+
+			//扩展浏览器上传文件
+			//3.0++版本
+			public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
+				openFileChooserImpl(uploadMsg);
+			}
+
+			//3.0--版本
+			public void openFileChooser(ValueCallback<Uri> uploadMsg) {
+				openFileChooserImpl(uploadMsg);
+			}
+
+			public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+				openFileChooserImpl(uploadMsg);
+			}
+
+			@Override
+			public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+				onenFileChooseImpleForAndroid(filePathCallback);
+				return true;
+			}
 	    }
+
+	private void openFileChooserImpl(ValueCallback<Uri> uploadMsg) {
+		mUploadMessage = uploadMsg;
+		Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+		i.addCategory(Intent.CATEGORY_OPENABLE);
+		i.setType("image/*");
+		startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+	}
+
+	public final static int FILECHOOSER_RESULTCODE_FOR_ANDROID_5 = 2;
+	public ValueCallback<Uri[]> mUploadMessageForAndroid5;
+	private void onenFileChooseImpleForAndroid(ValueCallback<Uri[]> filePathCallback) {
+		mUploadMessageForAndroid5 = filePathCallback;
+		Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+		contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+		contentSelectionIntent.setType("image/*");
+
+		Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+		chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+		chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
+
+		startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE_FOR_ANDROID_5);
+	}
+
 
 		@Override
 		public boolean onLongClick(View v) {
@@ -276,7 +346,7 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 		            return null;
 		        }
 		    }
-		   
+	private static final int WRITE_EXTERNAL_STORAGE_TASK_CODE = 1;
 		   /**
 		     * 判断是否为二维码
 		     * param url 图片地址
@@ -286,10 +356,15 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 		        if (isBase64) {
 		            Bitmap bitmap = PictureUtil.base64ToBitmap(sUrl);
 		            result = DecodeImage.handleQRCodeFormBitmap(bitmap);
-		            saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
+//					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+//						//如果6.0以上版本
+//					}else {
+						saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
+//					}
 
 		        } else {
-		            result = DecodeImage.handleQRCodeFormBitmap(getBitmap(sUrl));
+					Log.e("getBitMap","getBitmap:" + getBitmap(sUrl));
+					result = DecodeImage.handleQRCodeFormBitmap(getBitmap(sUrl));
 		        }
 		        if (result == null) {
 		            isQR = false;
@@ -473,7 +548,8 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 		            if (conn.getResponseCode() == 200) {
 		                InputStream inputStream = conn.getInputStream();
 		                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-		                saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
+						Log.e("bitmap","" + bitmap);
+							saveMyBitmap(bitmap, "code");//先把bitmap生成jpg图片
 		                return bitmap;
 		            }
 		        } catch (Exception e) {
@@ -481,33 +557,98 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 		        }
 		        return null;
 		    }
-		    /**
+
+
+
+	public static final int EXTERNAL_STORAGE_REQ_CODE = 10 ;
+
+	public void requestPermission(){
+		//判断当前Activity是否已经获得了该权限
+		if (ContextCompat.checkSelfPermission(this,
+				android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+				!= PackageManager.PERMISSION_GRANTED) {
+
+			//如果App的权限申请曾经被用户拒绝过，就需要在这里跟用户做出解释
+			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+					android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+				Toast.makeText(this,"please give me the permission",Toast.LENGTH_SHORT).show();
+			} else {
+				//进行权限请求
+				ActivityCompat.requestPermissions(this,
+						new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						EXTERNAL_STORAGE_REQ_CODE);
+			}
+		}
+	}
+
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   String permissions[], int[] grantResults) {
+		switch (requestCode) {
+			case EXTERNAL_STORAGE_REQ_CODE: {
+				// 如果请求被拒绝，那么通常grantResults数组为空
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					//申请成功，进行相应操作
+					if (!file.exists()) {
+						try {
+							file.createNewFile();
+							setFileOp();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				} else {
+					//申请失败，可以继续向用户解释。
+					Toast.makeText(WebAct.this, "手机不让申请", Toast.LENGTH_SHORT).show();
+				}
+				return;
+			}
+		}
+	}
+	/**
 		     * bitmap 保存为jpg 图片
 		     *
 		     * @param mBitmap 图片源
 		     * @param bitName 图片名
 		     */
+	         Bitmap mBitmap = null;
 		    public void saveMyBitmap(Bitmap mBitmap, String bitName) {
-		        file = new File(Environment.getExternalStorageDirectory() + "/" + bitName + ".jpg");
-		        FileOutputStream fOut = null;
-		        try {
-		            fOut = new FileOutputStream(file);
-		        } catch (FileNotFoundException e) {
-		            e.printStackTrace();
-		        }
-		        mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-		        try {
-		            fOut.flush();
-		        } catch (IOException e) {
-		            e.printStackTrace();
-		        }
-		        try {
-		            fOut.close();
-		        } catch (IOException e) {
-		            e.printStackTrace();
-		        }
+
+
+				this.mBitmap = mBitmap;
+					file = new File(Environment.getExternalStorageDirectory() + "/" + bitName + ".jpg");
+				if ( Build.VERSION.SDK_INT >= 21 ) {
+					requestPermission();
+
+				}else {
+					setFileOp();
+				}
 		    }
-		    @Override
+
+	private void setFileOp() {
+		FileOutputStream fOut = null;
+		try {
+            fOut = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+		mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+		try {
+            fOut.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+		try {
+            fOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+
+
+	@Override
 		    public boolean onKeyDown(int keyCode, KeyEvent event) {
 		        switch (keyCode) {
 		            case KeyEvent.KEYCODE_BACK:
@@ -543,7 +684,6 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 			public void onClick(View v) {
 				 switch (v.getId()) {
 		            case R.id.load_faild:
-
 		                mWebView.reload();
 		            case R.id.tv1:
 		                if (!TextUtils.isEmpty(mUrl) && !isHome) {
@@ -626,5 +766,39 @@ public class WebAct extends Activity implements OnLongClickListener,OnClickListe
 			        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			        startActivity(Intent.createChooser(intent, getTitle()));
 			    }
+
+	public static final int REQUEST_SELECT_FILE = 100;
+	public final static int FILECHOOSER_RESULTCODE = 1;
+	public ValueCallback<Uri[]> uploadMessage;
+	public ValueCallback<Uri> mUploadMessage;
+
+
+
+	@SuppressLint("NewApi")
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		if (requestCode == FILECHOOSER_RESULTCODE) {
+			if (null == mUploadMessage) return;
+			Uri result = intent == null || resultCode != RESULT_OK ? null : intent.getData();
+			mUploadMessage.onReceiveValue(result);
+			mUploadMessage = null;
+		} else if (requestCode == REQUEST_SELECT_FILE) {
+			if (uploadMessage == null) return;
+			uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
+			uploadMessage = null;
+		} else if (requestCode == FILECHOOSER_RESULTCODE_FOR_ANDROID_5){
+			if (null == mUploadMessageForAndroid5)
+				return;
+			Uri result = (intent == null || resultCode != RESULT_OK) ? null: intent.getData();
+			if (result != null) {
+				mUploadMessageForAndroid5.onReceiveValue(new Uri[]{result});
+			} else {
+				mUploadMessageForAndroid5.onReceiveValue(new Uri[]{});
+			}
+			mUploadMessageForAndroid5 = null;
+		}
+	}
+
+
 
 }

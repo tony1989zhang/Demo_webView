@@ -1,4 +1,4 @@
-package com.lottotrend.demo_webview;
+package com.shishizhong.pbx;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
